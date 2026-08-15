@@ -1,46 +1,86 @@
-# dsh-mobile
+# DeepSeek Harness Android
 
-DeepSeek Harness Android — 把 DeepSeek Harness 完整装进安卓手机：内嵌 Node.js 运行时 + 官方 Web UI，开箱即用的独立 App。
+原生 Android 壳应用，将 DeepSeek Harness 完整装进安卓手机。内嵌 Termux 运行时 + WebView UI，开箱即用。
 
-## 修复版本 (Patched)
-
-本仓库包含对 DeepSeek Harness v1.0.5 的修复版本，解决了 Android 上的 `EACCES: permission denied` 错误。
-
-### 问题描述
-
-原版 APK 在 Android 设备上运行时，会话持久化模块使用 `link()` 系统调用创建会话文件，但 Android 的 SELinux 策略禁止了该操作，导致：
-
-```
-EACCES: permission denied, link '/data/user/0/com.deepseek.dsh/files/dsh-home/sessions/.../session.jsonl.zstd.tmp' -> '.../session.jsonl.zstd'
-```
-
-### 修复内容
-
-将 `dsh-session-persistence-jsonl` 模块中的 `link()` 替换为 `rename()`：
-
-- **文件**: `dsh/node_modules/@deepseek-ai/dsh-session-persistence-jsonl/lib/index.js`
-- **修改**: `await link(tmp, finalPath)` → `await rename(tmp, finalPath)`
-- **原因**: `rename()` 在同一文件系统上是原子操作，且不受 Android SELinux 的 `link()` 限制
-
-### 安装方法
-
-1. 卸载原版 DeepSeek Harness（签名不同，无法直接覆盖安装）
-2. 下载 [releases/DeepSeek-Harness-v1.0.5-patched.apk](releases/DeepSeek-Harness-v1.0.5-patched.apk)
-3. 在设备上安装 APK
-
-### 项目结构
+## 项目架构
 
 ```
 dsh-mobile/
-├── README.md                          # 本文件
-├── releases/                          # 修复版 APK
-│   └── DeepSeek-Harness-v1.0.5-patched.apk
-── patch/                             # 修改的源代码
-    └── dsh-session-persistence-jsonl-index.js
+├── build.gradle.kts          # 根级 Gradle 配置 (AGP 8.8.2 + Kotlin 2.0.21)
+├── settings.gradle.kts       # 项目设置
+├── gradle.properties         # JVM / AndroidX 配置
+├── gradlew / gradlew.bat     # Gradle Wrapper 入口
+├── gradle/wrapper/           # Gradle 8.11.1 Wrapper
+├── docs/
+│   └── design.md             # 设计文档
+└── app/
+    ├── build.gradle.kts      # 模块配置 (minSdk 26, targetSdk 34, compileSdk 36)
+    └── src/main/
+        ├── AndroidManifest.xml
+        ├── java/com/dshmobile/shell/
+        │   ├── MainActivity.kt       # 主 Activity (WebView + 引擎引导)
+        │   ├── EngineManager.kt      # 引擎生命周期管理
+        │   ├── EngineService.kt      # 前台服务 (看门狗保活)
+        │   ├── AndroidBridge.kt      # JS 桥协议 v1
+        │   ├── EngineProbe.kt        # 引擎可达性探测
+        │   ├── ShizukuSupport.kt     # Shizuku 保活增强
+        │   ├── SnapshotExtractor.kt  # 运行时快照解压
+        │   └── UpdateManager.kt      # 在线热更新
+        └── res/                      # Android 资源
 ```
 
-### 注意事项
+## 核心特性
 
-- 本版本使用自签名证书重新签名，安装时系统会提示签名不匹配
-- 修改仅影响文件写入方式，不影响会话数据格式
-- 现有会话数据不受影响
+- **内嵌引擎**：首次启动自动解压 Termux 运行时快照（~70MB），无需安装 Termux
+- **WebView 壳**：消费 `http://127.0.0.1:3080` 本地引擎，桥协议版本化
+- **前台服务**：看门狗每 5 秒探测引擎，崩溃自动重启
+- **Android 15 适配**：targetSdk 34 + LD_PRELOAD + linker64 回退
+- **存储桥接**：SAF 目录选择 + All Files Access + 数据迁移到 Documents/dshdata
+- **JS 桥协议 v1**：目录选择、屏幕常亮、通知、All Files Access 引导
+- **热更新**：manifest 驱动的运行时快照更新（SHA-256 校验 + 原子切换）
+- **深色模式**：系统深色状态推送到 WebView
+
+## 构建
+
+### 前置条件
+
+1. 准备运行时快照：从 [GitHub Releases](https://github.com/thness/dsh-mobile/releases) 下载 `snapshot.tar.xz` 放到 `app/src/main/assets/snapshot.tar.xz`
+2. JDK 17+
+
+### 构建命令
+
+```bash
+./gradlew assembleDebug
+```
+
+产物位于 `app/build/outputs/apk/debug/app-debug.apk`
+
+## 权限说明
+
+| 权限 | 用途 |
+|------|------|
+| `INTERNET` | WebView + 引擎探测 |
+| `MANAGE_EXTERNAL_STORAGE` | bash 进程访问用户目录 |
+| `POST_NOTIFICATIONS` | 通知 |
+| `FOREGROUND_SERVICE` | 引擎保活 |
+| `FOREGROUND_SERVICE_DATA_SYNC` | 前台服务类型 |
+
+## 修复记录
+
+### v1.0.5-patched (原始修复)
+- 修复 `EACCES: permission denied, link` 错误：将 `link()` 替换为 `rename()`
+- 修复沙箱不可用错误：添加 Android passthrough 模式
+- 修复 `spawn bash ENOENT`：使用 `/system/bin/sh` 替代
+- 修复 glob 失败：添加 JavaScript glob 回退
+
+### v0.10.3 (原生重构)
+- 重构为原生 Android 项目结构
+- 内嵌 Termux 运行时，无需外部 Termux 安装
+- 添加前台服务保活 + 看门狗
+- 添加 JS 桥协议 v1
+- 添加 Android 15 ELF 执行限制适配
+- 添加在线热更新支持
+
+## 许可证
+
+MIT License

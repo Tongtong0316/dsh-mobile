@@ -1,17 +1,12 @@
-# Build artifacts
-*.class
-*.dex
-*.so
-
-# IDE
-.idea/
-.vscode/
-*.iml
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Temporary files
-*.tmp
-*.log
+build/
+.gradle/
+local.properties
+snapshot/
+app/src/main/assets/snapshot.tar.xz
+# 敏感数据（安全审计 2026-08-14）
+*.credentials.yaml
+token*
+*.key
+*.pem
+*.p12
+.kotlin/
