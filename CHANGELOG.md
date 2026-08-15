@@ -1,150 +1,47 @@
-# DeepSeek Harness Mobile - Development Log
+# DeepSeek Harness Mobile - 开发日志
 
 ## v0.10.1 (2026-08-15)
 
-### APK Structure Analysis
+首个公开发布版本。
 
-**Package**: `com.dshmobile.shell`  
-**Size**: 41 MB  
-**Target SDK**: 36 (Android 16)  
-**Min SDK**: 26 (Android 8.0)
+### 功能
+- 完整 DeepSeek Harness 功能移植至 Android
+- 内嵌 Node.js 运行时（37 MB snapshot）
+- WebView UI，连接本地引擎 `127.0.0.1:3080`
+- 前台服务后台常驻
+- Shizuku 集成（可选特权操作）
+- OTA 更新支持（SHA-256 校验）
+- 外部存储工作区
 
-### Architecture Overview
+### 架构
+- **包名**: `com.dshmobile.shell`
+- **目标 SDK**: 36 (Android 16)
+- **最低 SDK**: 26 (Android 8.0)
+- **APK 大小**: 41 MB
 
-```
-dsh-mobile-v0.10.1.apk
-├── AndroidManifest.xml          # App manifest
-├── classes.dex                  # Main DEX (8.2 MB)
-├── classes2.dex                 # Secondary DEX (18 KB)
-├── classes3.dex                 # Tertiary DEX (76 KB)
-├── assets/
-│   └── snapshot.tar.xz          # Runtime snapshot (37 MB)
-├── res/                         # Resources (drawables, layouts, etc.)
-├── kotlin/                      # Kotlin metadata
-└── META-INF/                    # Signing & dependencies
-```
+### 核心组件
+| 组件 | 功能 |
+|------|------|
+| `MainActivity` | WebView 容器，UI 交互 |
+| `EngineManager` | Node.js 引擎生命周期管理 |
+| `EngineService` | 前台服务，保持引擎运行 |
+| `AndroidBridge` | JS 桥接协议 v1 |
+| `ShizukuSupport` | Shizuku 特权操作支持 |
+| `SnapshotExtractor` | 运行时快照解压（XZ/LZMA2） |
+| `UpdateManager` | OTA 更新管理 |
 
-### Native Components (Kotlin/Java)
+### 依赖
+- AndroidX (Activity, Lifecycle, ViewModel, SavedState)
+- Shizuku (rikka.shizuku) — 特权 API
+- Tukaani XZ — LZMA2 解压
+- Kotlin Coroutines — 异步操作
 
-| Class | Purpose |
-|-------|---------|
-| `MainActivity` | Main activity with WebView, 28 lambda handlers |
-| `EngineManager` | Node.js engine lifecycle management |
-| `EngineService` | Foreground service for engine process |
-| `EngineProbe` | Engine health check and monitoring |
-| `AndroidBridge` | JavaScript bridge protocol v1 |
-| `ShizukuSupport` | Shizuku integration for privileged ops |
-| `SnapshotExtractor` | Extracts snapshot.tar.xz to runtime dir |
-| `UpdateManager` | OTA update with SHA-256 verification |
-
-### Dependencies
-
-- **AndroidX**: Activity, Lifecycle, ViewModel, SavedState, ProfileInstaller
-- **Shizuku** (rikka.shizuku): Privileged API access
-- **Tukaani XZ**: LZMA2 decompression for snapshot
-- **Kotlin Coroutines**: Async operations
-
-### Permissions
-
-| Permission | Purpose |
-|------------|---------|
-| `INTERNET` | API access, WebView communication |
-| `MANAGE_EXTERNAL_STORAGE` | File system access for workspace |
-| `POST_NOTIFICATIONS` | Foreground service notification |
-| `FOREGROUND_SERVICE` | Keep engine alive |
-| `FOREGROUND_SERVICE_DATA_SYNC` | Data sync service type |
-| `moe.shizuku.manager.permission.API_V23` | Shizuku API access |
-
-### Features
-
-- **WebView-based UI**: Connects to local Node.js server at `127.0.0.1:3080`
-- **Engine Management**: Automatic extraction and startup of Node.js runtime
-- **Foreground Service**: Keeps engine running in background
-- **Shizuku Integration**: Optional privileged operations without root
-- **OTA Updates**: Built-in update checker with SHA-256 verification
-- **Network Security**: Cleartext traffic allowed for localhost
-
----
-
-## Previous Patches (v1.0.5-patched-v1 to v5)
-
-### v1.0.5-patched-v1
-- Initial patch for file system permission errors
-- Replaced `link()` with `rename()` in session persistence
-
-### v1.0.5-patched-v2
-- External storage workspace configuration
-- Default browse root for file picker
-
-### v1.0.5-patched-v3
-- Sandbox passthrough mode for Android
-- Shell fallback from bash to `/system/bin/sh`
-- JavaScript glob fallback when ripgrep unavailable
-
-### v1.0.5-patched-v4
-- Termux environment initialization
-- LD_PRELOAD support for termux-exec
-- SONAME symlink fixes for shared libraries
-- Re-enabled `dsh-tool-bash` in Android preset
-
-### v1.0.5-patched-v5
-- DNS resolution fix (Android system properties → resolv.conf)
-- SSL certificate path configuration
-- IPv4-first DNS resolution order
-
----
-
-## Development Roadmap
-
-### Phase 1: Native Android Shell (Current)
-- [x] WebView-based UI shell
-- [x] Engine extraction and startup
-- [x] Foreground service for background execution
-- [x] Shizuku integration for privileged ops
-- [x] OTA update mechanism
-
-### Phase 2: Runtime Optimization
-- [ ] Reduce snapshot size (currently 37 MB)
-- [ ] Lazy loading for engine components
-- [ ] Better error handling and recovery
-- [ ] Crash reporting integration
-
-### Phase 3: Feature Parity
-- [ ] Full Termux compatibility
-- [ ] Plugin system support
-- [ ] Multiple model provider support
-- [ ] Offline mode with local models
-
-### Phase 4: Performance
-- [ ] Native code compilation (JNI)
-- [ ] Memory optimization for low-end devices
-- [ ] Battery optimization
-- [ ] Background task scheduling
-
----
-
-## Known Issues
-
-1. **Network Connectivity**: Node.js process may fail to resolve DNS on some Android versions
-2. **SSL Certificates**: HTTPS connections require proper CA certificate configuration
-3. **Memory Usage**: Engine can consume significant RAM on older devices
-4. **Battery Drain**: Foreground service keeps CPU active
-
----
-
-## Build Information
-
-- **Build Date**: 2026-08-15
-- **Build Tool**: Gradle 8.11.1 + AGP 8.8.2
-- **Kotlin Version**: 2.1.0
-- **Signing**: Debug keystore (self-signed)
-
----
-
-## License
-
-This project is open source under the MIT License.
-
-## Repository
-
-GitHub: [thness/dsh-mobile](https://github.com/thness/dsh-mobile)
+### 权限
+| 权限 | 用途 |
+|------|------|
+| `INTERNET` | API 访问、WebView 通信 |
+| `MANAGE_EXTERNAL_STORAGE` | 文件系统访问 |
+| `POST_NOTIFICATIONS` | 前台服务通知 |
+| `FOREGROUND_SERVICE` | 后台保活 |
+| `FOREGROUND_SERVICE_DATA_SYNC` | 数据同步服务 |
+| `moe.shizuku.manager.permission.API_V23` | Shizuku API |
