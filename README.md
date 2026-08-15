@@ -1,86 +1,130 @@
-# DeepSeek Harness Android
+# DeepSeek Harness Mobile
 
-原生 Android 壳应用，将 DeepSeek Harness 完整装进安卓手机。内嵌 Termux 运行时 + WebView UI，开箱即用。
+把 DeepSeek Harness 完整装进安卓手机：内嵌 Node.js 运行时 + 官方 Web UI，开箱即用的独立 App。
 
-## 项目架构
+## 下载
+
+| 版本 | 大小 | 说明 | 下载 |
+|------|------|------|------|
+| v0.10.1 | 41 MB | 官方正式版（推荐） | [APK](https://github.com/thness/dsh-mobile/releases/download/v0.10.1/dsh-mobile-v0.10.1.apk) |
+| v1.0.5-patched-v5 | 140 MB | 补丁版（含网络修复） | [APK](https://github.com/thness/dsh-mobile/releases/download/v1.0.5-patched-v5/DeepSeek-Harness-v1.0.5-patched-v5.apk) |
+
+## 功能特性
+
+- **完整 DeepSeek Harness**：内嵌 Node.js 运行时，包含所有官方功能
+- **WebView UI**：原生 Android 界面，流畅体验
+- **后台运行**：前台服务保持引擎常驻
+- **文件访问**：支持外部存储工作区
+- **Shizuku 集成**：可选特权操作（无需 root）
+- **OTA 更新**：内置更新检查器
+
+## 系统要求
+
+- Android 8.0+ (API 26)
+- 建议 4GB+ RAM
+- 建议 500MB+ 可用存储
+
+## 安装说明
+
+### 正式版 (v0.10.1)
+
+1. 下载 `dsh-mobile-v0.10.1.apk`
+2. 允许安装未知来源应用
+3. 安装 APK
+4. 启动应用，等待引擎初始化（首次约 30 秒）
+
+### 补丁版 (v1.0.5-patched-v5)
+
+补丁版包含以下修复：
+- 文件系统权限修复
+- Termux 环境适配
+- DNS 解析修复
+- SSL 证书配置
+- Shell 命令兼容
+
+**注意**：补丁版使用自签名证书，需先卸载旧版本。
+
+## 架构
 
 ```
-dsh-mobile/
-├── build.gradle.kts          # 根级 Gradle 配置 (AGP 8.8.2 + Kotlin 2.0.21)
-├── settings.gradle.kts       # 项目设置
-├── gradle.properties         # JVM / AndroidX 配置
-├── gradlew / gradlew.bat     # Gradle Wrapper 入口
-├── gradle/wrapper/           # Gradle 8.11.1 Wrapper
-├── docs/
-│   └── design.md             # 设计文档
-└── app/
-    ├── build.gradle.kts      # 模块配置 (minSdk 26, targetSdk 34, compileSdk 36)
-    └── src/main/
-        ├── AndroidManifest.xml
-        ├── java/com/dshmobile/shell/
-        │   ├── MainActivity.kt       # 主 Activity (WebView + 引擎引导)
-        │   ├── EngineManager.kt      # 引擎生命周期管理
-        │   ├── EngineService.kt      # 前台服务 (看门狗保活)
-        │   ├── AndroidBridge.kt      # JS 桥协议 v1
-        │   ├── EngineProbe.kt        # 引擎可达性探测
-        │   ├── ShizukuSupport.kt     # Shizuku 保活增强
-        │   ├── SnapshotExtractor.kt  # 运行时快照解压
-        │   └── UpdateManager.kt      # 在线热更新
-        └── res/                      # Android 资源
+┌─────────────────────────────────────┐
+│           Android App               │
+│  ┌───────────────────────────────┐  │
+│  │         WebView UI            │  │
+│  │    (http://127.0.0.1:3080)    │  │
+│  └──────────────┬────────────────┘  │
+│                 │ HTTP              │
+│  ┌──────────────▼────────────────┐  │
+│  │      Node.js Engine           │  │
+│  │   (snapshot.tar.xz → runtime) │  │
+│  └──────────────┬────────────────┘  │
+│                 │                   │
+│  ┌──────────────▼────────────────┐  │
+│  │     EngineService             │  │
+│  │   (Foreground Service)        │  │
+│  └───────────────────────────────┘  │
+└─────────────────────────────────────┘
 ```
 
-## 核心特性
+### 核心组件
 
-- **内嵌引擎**：首次启动自动解压 Termux 运行时快照（~70MB），无需安装 Termux
-- **WebView 壳**：消费 `http://127.0.0.1:3080` 本地引擎，桥协议版本化
-- **前台服务**：看门狗每 5 秒探测引擎，崩溃自动重启
-- **Android 15 适配**：targetSdk 34 + LD_PRELOAD + linker64 回退
-- **存储桥接**：SAF 目录选择 + All Files Access + 数据迁移到 Documents/dshdata
-- **JS 桥协议 v1**：目录选择、屏幕常亮、通知、All Files Access 引导
-- **热更新**：manifest 驱动的运行时快照更新（SHA-256 校验 + 原子切换）
-- **深色模式**：系统深色状态推送到 WebView
+| 组件 | 功能 |
+|------|------|
+| `MainActivity` | WebView 容器，UI 交互 |
+| `EngineManager` | Node.js 引擎生命周期管理 |
+| `EngineService` | 前台服务，保持引擎运行 |
+| `AndroidBridge` | JS 桥接协议 v1 |
+| `ShizukuSupport` | Shizuku 特权操作支持 |
+| `SnapshotExtractor` | 运行时快照解压 |
+| `UpdateManager` | OTA 更新管理 |
+
+## 开发日志
+
+详见 [CHANGELOG.md](CHANGELOG.md)
 
 ## 构建
 
-### 前置条件
-
-1. 准备运行时快照：从 [GitHub Releases](https://github.com/thness/dsh-mobile/releases) 下载 `snapshot.tar.xz` 放到 `app/src/main/assets/snapshot.tar.xz`
-2. JDK 17+
-
-### 构建命令
-
 ```bash
+# 克隆仓库
+git clone https://github.com/thness/dsh-mobile.git
+cd dsh-mobile
+
+# 将 snapshot.tar.xz 放入 app/src/main/assets/
+# 可从 Release 下载
+
+# 构建 Debug APK
 ./gradlew assembleDebug
+
+# 构建 Release APK
+./gradlew assembleRelease
 ```
 
-产物位于 `app/build/outputs/apk/debug/app-debug.apk`
+## 已知问题
 
-## 权限说明
+1. **网络连接**：部分 Android 版本 DNS 解析可能失败
+2. **SSL 证书**：HTTPS 连接需要正确配置 CA 证书
+3. **内存占用**：引擎在低端设备上可能占用较多 RAM
+4. **电池消耗**：前台服务会保持 CPU 活跃
 
-| 权限 | 用途 |
-|------|------|
-| `INTERNET` | WebView + 引擎探测 |
-| `MANAGE_EXTERNAL_STORAGE` | bash 进程访问用户目录 |
-| `POST_NOTIFICATIONS` | 通知 |
-| `FOREGROUND_SERVICE` | 引擎保活 |
-| `FOREGROUND_SERVICE_DATA_SYNC` | 前台服务类型 |
+## 路线图
 
-## 修复记录
-
-### v1.0.5-patched (原始修复)
-- 修复 `EACCES: permission denied, link` 错误：将 `link()` 替换为 `rename()`
-- 修复沙箱不可用错误：添加 Android passthrough 模式
-- 修复 `spawn bash ENOENT`：使用 `/system/bin/sh` 替代
-- 修复 glob 失败：添加 JavaScript glob 回退
-
-### v0.10.3 (原生重构)
-- 重构为原生 Android 项目结构
-- 内嵌 Termux 运行时，无需外部 Termux 安装
-- 添加前台服务保活 + 看门狗
-- 添加 JS 桥协议 v1
-- 添加 Android 15 ELF 执行限制适配
-- 添加在线热更新支持
+- [ ] 减小运行时快照体积
+- [ ] 引擎组件懒加载
+- [ ] 崩溃报告集成
+- [ ] 完整 Termux 兼容性
+- [ ] 插件系统支持
+- [ ] 多模型提供商支持
+- [ ] 离线模式（本地模型）
+- [ ] JNI 原生代码编译
+- [ ] 低端设备内存优化
+- [ ] 电池优化
 
 ## 许可证
 
 MIT License
+
+## 相关链接
+
+- [DeepSeek](https://www.deepseek.com)
+- [DeepSeek Harness](https://github.com/deepseek-ai/harness)
+- [Shizuku](https://github.com/RikkaApps/Shizuku)
