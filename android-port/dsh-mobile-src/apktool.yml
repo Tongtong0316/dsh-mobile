@@ -1,0 +1,31 @@
+version: 3.0.3
+apkFileName: dsh-mobile-v0.10.1.apk
+usesFramework:
+  ids:
+  - 1
+sdkInfo:
+  minSdkVersion: 26
+  targetSdkVersion: 34
+versionInfo:
+  versionCode: 5
+  versionName: 0.10.1
+resourcesInfo:
+  packageId: 127
+doNotCompress:
+- arsc
+- png
+- META-INF/androidx.activity_activity-ktx.version
+- META-INF/androidx.activity_activity.version
+- META-INF/androidx.annotation_annotation-experimental.version
+- META-INF/androidx.core_core-ktx.version
+- META-INF/androidx.core_core.version
+- META-INF/androidx.interpolator_interpolator.version
+- META-INF/androidx.profileinstaller_profileinstaller.version
+- META-INF/androidx.savedstate_savedstate-ktx.version
+- META-INF/androidx.savedstate_savedstate.version
+- META-INF/androidx.startup_startup-runtime.version
+- META-INF/androidx.tracing_tracing.version
+- META-INF/androidx.versionedparcelable_versionedparcelable.version
+- META-INF/kotlinx_coroutines_android.version
+- META-INF/kotlinx_coroutines_core.version
+- assets/snapshot.tar.xz

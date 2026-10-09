@@ -1,12 +1,13 @@
-build/
-.gradle/
-local.properties
-snapshot/
-app/src/main/assets/snapshot.tar.xz
-# 敏感数据（安全审计 2026-08-14）
-*.credentials.yaml
-token*
-*.key
-*.pem
-*.p12
-.kotlin/
+# 构建产物与二进制载荷（可由脚本重建）
+android-port/dsh-mobile-src/assets/snapshot.tar.xz
+android-port/dsh-mobile-src/build/
+android-port/*.apk
+android-port/build-*.apk
+*.idsig
+# 签名密钥绝不入库
+*.keystore
+# 暂存区
+stage/
+snap/
+node_modules/
+.DS_Store

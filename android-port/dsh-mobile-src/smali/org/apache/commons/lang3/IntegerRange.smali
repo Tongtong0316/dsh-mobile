@@ -1,0 +1,67 @@
+.class public final Lorg/apache/commons/lang3/IntegerRange;
+.super Lorg/apache/commons/lang3/NumberRange;
+.source "IntegerRange.java"
+
+
+# annotations
+.annotation system Ldalvik/annotation/Signature;
+    value = {
+        "Lorg/apache/commons/lang3/NumberRange<",
+        "Ljava/lang/Integer;",
+        ">;"
+    }
+.end annotation
+
+
+# static fields
+.field private static final serialVersionUID:J = 0x1L
+
+
+# direct methods
+.method private constructor <init>(Ljava/lang/Integer;Ljava/lang/Integer;)V
+    .locals 1
+    .param p1, "number1"    # Ljava/lang/Integer;
+    .param p2, "number2"    # Ljava/lang/Integer;
+
+    .line 81
+    const/4 v0, 0x0
+
+    invoke-direct {p0, p1, p2, v0}, Lorg/apache/commons/lang3/NumberRange;-><init>(Ljava/lang/Number;Ljava/lang/Number;Ljava/util/Comparator;)V
+
+    .line 82
+    return-void
+.end method
+
+.method public static of(II)Lorg/apache/commons/lang3/IntegerRange;
+    .locals 2
+    .param p0, "fromInclusive"    # I
+    .param p1, "toInclusive"    # I
+
+    .line 49
+    invoke-static {p0}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+
+    move-result-object v0
+
+    invoke-static {p1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+
+    move-result-object v1
+
+    invoke-static {v0, v1}, Lorg/apache/commons/lang3/IntegerRange;->of(Ljava/lang/Integer;Ljava/lang/Integer;)Lorg/apache/commons/lang3/IntegerRange;
+
+    move-result-object v0
+
+    return-object v0
+.end method
+
+.method public static of(Ljava/lang/Integer;Ljava/lang/Integer;)Lorg/apache/commons/lang3/IntegerRange;
+    .locals 1
+    .param p0, "fromInclusive"    # Ljava/lang/Integer;
+    .param p1, "toInclusive"    # Ljava/lang/Integer;
+
+    .line 69
+    new-instance v0, Lorg/apache/commons/lang3/IntegerRange;
+
+    invoke-direct {v0, p0, p1}, Lorg/apache/commons/lang3/IntegerRange;-><init>(Ljava/lang/Integer;Ljava/lang/Integer;)V
+
+    return-object v0
+.end method
