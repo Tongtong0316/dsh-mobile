@@ -13,6 +13,7 @@
 #
 set -eu
 STAGE="${1:?用法: sh apply-dsh-patches.sh <npm-stage>}"
+STAGE=$(cd "$STAGE" && pwd)   # 转绝对路径，脚本内部 node require 引用才可靠
 HERE=$(cd "$(dirname "$0")" && pwd)
 NM="$STAGE/node_modules"
 
