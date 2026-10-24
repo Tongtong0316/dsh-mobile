@@ -89,6 +89,8 @@
 
     invoke-virtual {v0}, Lcom/dshmobile/shell/MainActivity;->revealWeb()V
 
+    invoke-static {p1}, Lcom/dshmobile/shell/WebLaunch;->injectMobileFit(Landroid/webkit/WebView;)V
+
     .line 175
     return-void
 .end method

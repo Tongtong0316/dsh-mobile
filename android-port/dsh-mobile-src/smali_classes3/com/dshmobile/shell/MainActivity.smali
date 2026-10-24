@@ -1235,6 +1235,14 @@
 
     invoke-virtual {v3, v1}, Landroid/webkit/WebSettings;->setMediaPlaybackRequiresUserGesture(Z)V
 
+    invoke-virtual {v3, v1}, Landroid/webkit/WebSettings;->setSupportZoom(Z)V
+
+    invoke-virtual {v3, v1}, Landroid/webkit/WebSettings;->setBuiltInZoomControls(Z)V
+
+    const/16 v7, 0x64
+
+    invoke-virtual {v3, v7}, Landroid/webkit/WebSettings;->setTextZoom(I)V
+
     .line 139
     invoke-virtual {v3, v2}, Landroid/webkit/WebSettings;->setMixedContentMode(I)V
 

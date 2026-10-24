@@ -1,0 +1,54 @@
+@media(max-width:600px){
+  [data-shortcut-modal="settings"][role="dialog"]{
+    display:flex!important;flex-direction:column!important;
+    width:100vw!important;max-width:100vw!important;height:100dvh!important;
+    max-height:100dvh!important;margin:0!important;border-radius:0!important;
+    box-sizing:border-box!important;overflow:hidden!important;
+  }
+  [data-shortcut-modal="settings"]>nav{flex:none;width:100%!important;max-width:none!important;box-sizing:border-box!important;padding:12px 12px 0!important;min-width:0!important}
+  [data-shortcut-modal="settings"] [class$="_navTitle"]{padding:0 48px 12px 4px!important;font-size:18px!important;line-height:32px!important}
+  [data-shortcut-modal="settings"] [class$="_navList"]{display:flex!important;flex-direction:row!important;gap:6px!important;overflow-x:auto!important;overflow-y:hidden!important;padding-bottom:10px!important;flex:none!important}
+  [data-shortcut-modal="settings"] [class*="_navCell"]{flex:0 0 auto!important;min-height:44px!important;padding:10px 12px!important;white-space:nowrap!important}
+  [data-shortcut-modal="settings"] [class$="_navLabel"]{flex:none!important}
+  [data-shortcut-modal="settings"]>[class$="_content"]{display:flex!important;flex-direction:column!important;flex:1!important;min-width:0!important;min-height:0!important}
+  [data-shortcut-modal="settings"] [class$="_header"]{height:auto!important;flex:none!important;padding:4px 16px 8px!important;min-height:52px!important}
+  [data-shortcut-modal="settings"] [class$="_close"]{position:absolute!important;top:6px!important;right:8px!important;width:44px!important;height:44px!important}
+  [data-shortcut-modal="settings"] [class$="_options"]{flex:1!important;min-height:0!important;padding:0 16px 24px!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain}
+  [data-shortcut-modal="settings"] button:not([role="switch"]){min-height:44px!important;min-width:44px!important;box-sizing:border-box!important}
+  /* Keep a 48x44 touch target; paint the 44x26 track inside it. */
+  [data-shortcut-modal="settings"] button[role="switch"]{
+    position:relative!important;display:block!important;flex:0 0 48px!important;
+    width:48px!important;min-width:48px!important;max-width:48px!important;
+    height:44px!important;min-height:44px!important;max-height:44px!important;
+    padding:0!important;border:0!important;background:transparent!important;
+    box-sizing:border-box!important;border-radius:8px!important;
+  }
+  [data-shortcut-modal="settings"] button[role="switch"]::before{
+    content:"";position:absolute;left:2px;top:9px;width:44px;height:26px;
+    border-radius:13px;corner-shape:round;background:var(--dsw-alias-border-l3,#b8bdc6);
+    pointer-events:none;transition:background-color .15s ease;
+  }
+  [data-shortcut-modal="settings"] button[role="switch"][aria-checked="true"]::before{
+    background:var(--dsw-alias-brand-primary,#0f1115);
+  }
+  [data-shortcut-modal="settings"] button[role="switch"]>span{
+    position:absolute!important;left:5px!important;top:12px!important;
+    width:20px!important;height:20px!important;border-radius:50%!important;
+    margin:0!important;corner-shape:round!important;background:var(--dsw-alias-label-primary-foreground,#fff)!important;
+    transform:translateX(0)!important;pointer-events:none;
+    transition:transform .15s ease!important;
+  }
+  [data-shortcut-modal="settings"] button[role="switch"][aria-checked="true"]>span{transform:translateX(18px)!important}
+  [data-shortcut-modal="settings"] button[role="switch"][aria-checked="false"]>span{background:var(--dsw-alias-switch-thumb,#fff)!important}
+  [data-shortcut-modal="settings"] [class$="_rowText"]{min-width:0!important;flex:1!important}
+  [data-shortcut-modal="settings"] [class$="_selector"]{white-space:normal!important;max-width:180px!important}
+  [data-shortcut-modal="settings"] [class$="_cubeRow"]{display:flex!important;gap:8px!important}
+  [data-shortcut-modal="settings"] [class*="_themeCube"]{flex:1 1 0!important;width:auto!important;min-width:0!important;padding:12px 4px!important}
+  [data-shortcut-modal="settings"] [class$="_arrows"]{display:contents!important;opacity:1!important;visibility:visible!important}
+  [data-shortcut-modal="settings"] [class$="_stepper"]{width:auto!important;height:auto!important;min-height:44px!important;overflow:visible!important;gap:4px!important}
+  [data-shortcut-modal="settings"] [class$="_stepper"]>[class$="_value"]{order:1!important;min-width:24px!important;text-align:center!important}
+  [data-shortcut-modal="settings"] [class$="_arrows"]>button:first-child{order:2!important}
+  [data-shortcut-modal="settings"] [class$="_arrows"]>button:last-child{order:0!important}
+  [data-shortcut-modal="settings"] [class$="_row"]:has([class$="_stepper"]){flex-wrap:wrap!important;gap:12px!important}
+  [data-shortcut-modal="settings"] [class$="_control"]{flex-shrink:0!important;max-width:100%!important;flex-wrap:wrap!important}
+}
