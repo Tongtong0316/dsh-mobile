@@ -8,6 +8,14 @@ DeepSeek Harness（dsh）完整装进安卓平板/手机的工程化版本——
 > 本分叉的改造基于上游 v0.10.1 APK 的 apktool 解码树（`android-port/dsh-mobile-src/`，
 > smali 层），上游的 Kotlin 源码保留在原位供对照回移。发行包从 smali 树构建。
 
+## 适配设备
+
+| 形态 | 状态 | 说明 |
+|---|---|---|
+| **平板横屏**（小米 Pad 5 实测） | ✅ 主力形态 | 原生体验：官方桌面图标、零闪屏启动链 |
+| **手机竖屏**（Redmi K30 实测） | ✅ 已适配 | WebView 注入式竖屏方案：设置页全屏移动布局（顶部 tab）、侧栏抽屉化+遮罩、触控目标 ≥44px、输入 16px 字号、禁双指缩放；详见 `weblaunch-java/WebLaunch.java` 内嵌 CSS 与 `docs/2026-10-24-android-handoff.md` |
+| 通用 | arm64 + Android 8.0+ | x86 模拟器 / 32 位不支持 |
+
 ## 本分叉新增了什么
 
 ### 一、dsh 引擎侧：7 项安卓兼容补丁（`android-port/patches/`）
